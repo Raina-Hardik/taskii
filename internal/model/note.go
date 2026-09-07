@@ -5,9 +5,13 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/adrg/xdg"
 )
 
-const notesPath = "data/notes.json"
+func notesPath() (string, error) {
+	return xdg.DataFile("taskii/notes.json")
+}
 
 // Note is one bullet on the Notes board. Body may contain newlines (entered
 // with Shift+Enter / Alt+Enter) and has no length limit, so renderers must
@@ -19,7 +23,11 @@ type Note struct {
 }
 
 func LoadNotes() ([]Note, error) {
-	b, err := os.ReadFile(notesPath)
+	path, err := notesPath()
+	if err != nil {
+		return nil, err
+	}
+	b, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return []Note{}, nil
@@ -37,12 +45,16 @@ func LoadNotes() ([]Note, error) {
 }
 
 func SaveNotes(notes []Note) error {
-	if err := os.MkdirAll(filepath.Dir(notesPath), 0o755); err != nil {
+	path, err := notesPath()
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(notes, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(notesPath, b, 0o644)
+	return os.WriteFile(path, b, 0o644)
 }

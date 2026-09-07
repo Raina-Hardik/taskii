@@ -4,9 +4,13 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/adrg/xdg"
 )
 
-const settingsPath = "data/settings.json"
+func settingsPath() (string, error) {
+	return xdg.ConfigFile("taskii/settings.json")
+}
 
 type Settings struct {
 	Theme  string `json:"theme,omitempty"`
@@ -23,7 +27,11 @@ type Settings struct {
 }
 
 func LoadSettings() (Settings, error) {
-	b, err := os.ReadFile(settingsPath)
+	path, err := settingsPath()
+	if err != nil {
+		return Settings{}, err
+	}
+	b, err := os.ReadFile(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return Settings{}, nil
@@ -41,12 +49,16 @@ func LoadSettings() (Settings, error) {
 }
 
 func SaveSettings(s Settings) error {
-	if err := os.MkdirAll(filepath.Dir(settingsPath), 0o755); err != nil {
+	path, err := settingsPath()
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(settingsPath, b, 0o644)
+	return os.WriteFile(path, b, 0o644)
 }
