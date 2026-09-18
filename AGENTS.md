@@ -735,5 +735,14 @@ Fixed [#6](https://github.com/parsaenami/taskii/issues/6): relative path depende
 - Data files (`tasks.json`, `notes.json`) now resolve to `xdg.DataFile("taskii/...")` (`$XDG_DATA_HOME/taskii/` or `%LOCALAPPDATA%\taskii\`).
 - Configuration files (`settings.json`) now resolve to `xdg.ConfigFile("taskii/settings.json")` (`$XDG_CONFIG_HOME/taskii/` or `%APPDATA%\taskii\`).
 - Verified with unit tests (`internal/model/store_test.go`) isolating the test environment with `t.Setenv` and `xdg.Reload()`.
+## Bubbletint integration & interactive theme browser (2026-08-23)
+
+Integrated `github.com/lrstanley/bubbletint/v2` with an adapter function, interactive search modal, bidirectional quick-cycle keys, and extensible custom theme loading.
+
+- **Curated themes**: The 7 curated themes (`Ember`, `Tokyo Night`, `Dracula`, `Nord`, `Light`, `Monokai`, `Everforest`) remain the base curated themes.
+- **Keybindings**: `t` cycles curated themes forward, and `T` / `shift+t` opens the interactive fuzzy-search theme browser.
+- **Interactive Theme Browser (`T` / `shift+t`)**: Full modal dialog featuring live filtering across 340+ themes (by name or source), arrow navigation (`↑/↓`), real-time live preview of the selected theme, `Enter` to confirm & save to `data/settings.json`, and `Esc`/`ctrl+c` to cancel and revert to the previous theme.
+- **Adaptive tint conversion (`tintToTheme`)**: Bubbletint palettes are dynamically adapted to taskii's 3-layer surface model (`Bg`, `PaneBg`, `Panel`), computing contrast-aware `AppTitleFg` and generating a 5-step monotonic `HeatmapRamp`.
+- **Extensible custom theme support**: Users can drop custom `.json` or `.jsonl` theme files into `data/themes/` or `~/.config/taskii/themes/` supporting both full `Theme` definitions and `bubbletint.Tint` definitions.
 
 
